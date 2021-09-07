@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <title>Chat</title>
+  </head>
+  <body>
+    <h1>WebSocket Chat</h1>
+    <form action="" onsubmit="sendMessage(event)">
+      <input autocomplete="off" id="messageText" type="text" required placeholder="Введите сообщение"/>
+      <button>Отправить</button>
+    </form>
+    <p style="color: red; display: none;" id="error"></p>
+    <ol id='messages'></ol>
+    <script>
+      var error_container = document.getElementById('error');
+      function show_error(text) {
+          error_container.style.display = 'block';
+          error_container.innerText = 'Нет соединения с сервером';
+      }
+
+      var ws = new WebSocket("ws://localhost:8000/ws");
+
+      ws.onmessage = function (event) {
+        var data = JSON.parse(event.data);
+        if (data.status === 'OK') {
+          var messages = document.getElementById('messages');
+          var message = document.createElement('li');
+          var content = document.createTextNode(data.message);
+          message.appendChild(content);
+          messages.appendChild(message);
+        } else {
+          show_error(data.message);
+        }
+      };
+
+      function sendMessage(event) {
+        event.preventDefault();
+        if (ws.readyState === ws.OPEN) {
+          error_container.style.display = 'none';
+          var input = document.getElementById("messageText");
+          var data = {'message': document.getElementById("messageText").value};
+          ws.send(JSON.stringify(data));
+          input.value = '';
+        } else {
+          show_error('Нет соединения с сервером');
+        }
+      }
+    </script>
+  </body>
+</html>

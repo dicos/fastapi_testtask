@@ -10,7 +10,7 @@
       <button>Отправить</button>
     </form>
     <p style="color: red; display: none;" id="error"></p>
-    <ol id='messages'></ol>
+    <div id='messages'></div>
     <script>
       var error_container = document.getElementById('error');
       function show_error(text) {
@@ -19,13 +19,15 @@
       }
 
       var ws = new WebSocket("ws://localhost:8000/ws");
+      var number = 0;
 
       ws.onmessage = function (event) {
         var data = JSON.parse(event.data);
         if (data.status === 'OK') {
           var messages = document.getElementById('messages');
-          var message = document.createElement('li');
-          var content = document.createTextNode(data.message);
+          var message = document.createElement('p');
+          var content = document.createTextNode(data.number + '. ' + data.message);
+          number = data.number;
           message.appendChild(content);
           messages.appendChild(message);
         } else {
@@ -38,7 +40,10 @@
         if (ws.readyState === ws.OPEN) {
           error_container.style.display = 'none';
           var input = document.getElementById("messageText");
-          var data = {'message': document.getElementById("messageText").value};
+          var data = {
+            'message': document.getElementById("messageText").value,
+            'number': number
+          };
           ws.send(JSON.stringify(data));
           input.value = '';
         } else {

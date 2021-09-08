@@ -19,7 +19,6 @@
       }
 
       var ws = new WebSocket("ws://localhost:8000/ws");
-      var number = 0;
 
       ws.onmessage = function (event) {
         var data = JSON.parse(event.data);
@@ -27,7 +26,6 @@
           var messages = document.getElementById('messages');
           var message = document.createElement('p');
           var content = document.createTextNode(data.number + '. ' + data.message);
-          number = data.number;
           message.appendChild(content);
           messages.appendChild(message);
         } else {
@@ -41,8 +39,7 @@
           error_container.style.display = 'none';
           var input = document.getElementById("messageText");
           var data = {
-            'message': document.getElementById("messageText").value,
-            'number': number
+            'message': document.getElementById("messageText").value
           };
           ws.send(JSON.stringify(data));
           input.value = '';

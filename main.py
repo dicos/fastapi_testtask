@@ -1,7 +1,5 @@
 import os
-import sys
 import json
-import random
 
 from fastapi import FastAPI, WebSocket, Cookie, status, Depends
 from fastapi.responses import HTMLResponse
@@ -14,13 +12,16 @@ HTML_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'index.html
 
 
 SESSIONS = {}
+next_number = 1
 
 
 @app.get("/")
 async def get(number: str = Cookie(None)):
     if number in SESSIONS:
         del SESSIONS[number]
-    session_num = str(random.randint(0, sys.maxsize))
+    global next_number
+    session_num = str(next_number)
+    next_number += 1
     SESSIONS[session_num] = 0
     with open(HTML_PATH) as html_file:
         response = HTMLResponse(html_file.read())
